@@ -55,7 +55,7 @@ get "/users/create" do
     puts params
     users_table.insert(name: params["name"],
                         email: params["email"],
-                        password: params["password"],)
+                        password: BCrypt::Password.create(params["password"]),)
     view "create_user"
 end
 
@@ -71,7 +71,7 @@ post "/logins/create" do
     @user = users_table.where(email: email_address).to_a[0]
 
     if @user 
-        if @user[:password] == password
+        if BCrypt::Password.new(@user[:password]) == password
             session["user_id"] = @user[:id]
             view "create_login"
         else
